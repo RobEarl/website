@@ -1,12 +1,25 @@
 #!/usr/bin/perl
 
 use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+use CGI qw(param);
 
 use lib './lib';
 use warnings;
 use strict;
-use XML::Feed;
+
 use Template;
+use Text::Markdown;
+use URI::Fetch;
+use XML::Feed;
+
+my $blog = param('blog') || '';
+
+my $blog_url;
+if ($blog) {
+    $blog_url = "https://raw.githubusercontent.com/RobEarl/website/main/blog/${blog}/README.md";
+} else {
+    $blog_url = "https://raw.githubusercontent.com/RobEarl/website/main/index.md";
+}
 
 my $columns = 2;
 my $start   = 0x77dddd;
@@ -33,7 +46,7 @@ Content-type: text/html
 <html>
 <head>
 <title>Robert Earl's Website</title>
-<link rel="stylesheet" type="text/css" href="main.css" />
+<link rel="stylesheet" type="text/css" href="/main.css" />
 <meta name="google-site-verification" content="S6rv_lSoYeoWtTinzTXAgeDz0Tq9dlNHwH778Js3Qxs" />
 </head>
 <body>
@@ -69,11 +82,9 @@ $box_row
 [% END %]
 </table>
 
-[% FOREACH item = blog.items %]
-<div class="post"><span class="title"><a href="[% item.link %]">[% item.title %]</a></span> <span class="download">[% item.issued.dmy %] [% item.issued.hms %]</span>
-[% item.content.body %]
+<div class="post">
+[% blog %]
 </div>
-[% END %]
 
 </div>
 
@@ -103,9 +114,16 @@ my $tt = Template->new( #DEBUG => DEBUG_ALL,
 	)
   or die "Failed to load template: $Template::ERROR\n";
 
-my $blog;# = XML::Feed->parse(URI->new($feed_url, 'RSS')) or die XML::Feed->errstr;
+my $blog;
+my $res = URI::Fetch->fetch($blog_url);
+if ($res && $res->is_success) {
+    my $m = Text::Markdown->new;
+    $blog = $m->markdown($res->content);
+}
+
 my $stackoverflow = XML::Feed->parse(URI->new($stackoverflow_url));# or die XML::Feed->errstr;
 
-$tt->process( \$template, { 'blog' => ($blog || {'items'=>[]}),
+$tt->process( \$template, { 'blog' => ($blog || "Not Found"),
                             'stackoverflow' => ($stackoverflow || {'items'=>[]}) })
   or die $tt->error();
+

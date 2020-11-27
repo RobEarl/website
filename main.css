@@ -47,11 +47,10 @@ a {
 }
 
 #content div.post {
-        background-color: #eeeeee;
+        background-color: #ffffff;
         border: 1pt dashed #000000;
         padding: 10px;
         margin-bottom: 40px;
-	max-height: 300px;
 	overflow: hidden;
 }
 #content div.post span.title,span.download {
@@ -100,3 +99,7 @@ body {
 	background-color: #cccccc;
 }
 
+code {
+	white-space: pre-wrap;
+	background-color: #eeeeee;
+}
