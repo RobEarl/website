@@ -1,12 +1,11 @@
 #### 2020-11-27
 
-# Running Kubebuilder Tests in a Docker Container
-
+# Running Kubebuilder Tests on Kubernetes
 Kubebuilder's `suite_test.go` requires kubetools (etcd, kube-apiserver) to run. If you want to run them in a docker container (on Jenkins, for example), you're going to need a docker image with them installed. Fortunately, there is one, `gcr.io/kubebuilder/thirdparty-{linux,darwin}:<version>`. Unfortunately, it doesn't have golang installed, somewhat scuppering the plan to run go based tests on it.
 
 ## Getting golang and kubetools Together
 
-One solution is to maintain you own images - `FROM golang`, and install kubetools. This would mean maintaining your own Dockerfiles with all the combinations of golang version and kubetools version you might need. No thank you.
+One solution is to maintain your own images - `FROM golang`, and install kubetools. This would mean maintaining your own Dockerfiles with all the combinations of golang version and kubetools version you might need. No thank you.
 
 ## Injecting kubetools into golang Container
 
